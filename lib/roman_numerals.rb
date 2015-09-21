@@ -16,7 +16,7 @@ def solution(number)
 	result
 end
 
-p solution(2008)
+p ROMAN.keys.reverse
 
 
 
