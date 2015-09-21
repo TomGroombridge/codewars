@@ -11,12 +11,11 @@ end
 @test = @array.flatten.map(&:to_i)
 
 @i = 0
-@num = 1870
-
-@amount = []
-until  @i > @num do
-  @test.each do |feed|
-    @amount << (@i += feed)
-  end
+@lenders_needed = []
+@amount = @test.map {|feed| @i += feed }
+@amount.each do |a|
+   if a <= 1500
+    @lenders_needed <<  'needed'
+   end
 end
-puts @amount.inspect
+puts @lenders.first(@lenders_needed.count)
