@@ -2,7 +2,7 @@ require 'csv'
 
 
 
-@amount_request = 2331
+@amount_request = 1500
 @lenders = []
 CSV.foreach("../market.csv", headers: true) do |row|
   @lenders << {'name' => row[0], 'compound_interest' => row[1], 'amount' => row[2]}
@@ -25,8 +25,8 @@ if @amount_request > @amount.last
 else
 	puts "congratulations we can offer you a loan"
 	@lenders_needed = []
-	@amount.each { |a| @lenders_needed << a unless a >= @amount_request}
-
+	@amount.each_with_index { |a, b| @lenders_needed << b unless a >= @amount_request}
+	puts @lenders_needed.count
 
 
 
@@ -34,7 +34,7 @@ else
 	@lenders.first(@lenders_needed.count).each {|l| @compound_interest << l.values_at('compound_interest')}
 	@test = @compound_interest.flatten.map(&:to_f).inject { |sum, n| sum + n }
 
-	# puts (@test/@lenders_needed.count)
+	puts (@test/@lenders_needed.count)
 end
 
 
