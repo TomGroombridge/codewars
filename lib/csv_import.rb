@@ -32,21 +32,20 @@ else
 	@compound_interest = []
 	@lenders.first(@lenders_needed.count).each {|l| @compound_interest << l.values_at('compound_interest')}
 	@total_interest = @compound_interest.flatten.map(&:to_f).inject { |sum, n| sum + n }
-	@compound_interest = (@total_interest / @lenders_needed.count)
-	@principal_payment = @amount_request / 36
-	@remaining_principal = @amount_request
+	@compound_interest = (@total_interest / @lenders_needed.count).round(2)
+	@principal_payment = (@amount_request / 36).round(2)
+	@remaining_principal = (@amount_request)
 	@monthly_total = []
 
 	until @remaining_principal <= 0 do
-		@interest_per_month = ((@remaining_principal.round(2) * @compound_interest.round(2)) / 12)
-		@monthly_payment = @principal_payment.round(2) + @interest_per_month.round(2)
+		@interest_per_month = ((@remaining_principal * @compound_interest) / 12)
+		@monthly_payment = (@principal_payment + @interest_per_month).round(2)
 		@monthly_total << @monthly_payment
-		@remaining_principal = @remaining_principal - @principal_payment.round(2)
+		@remaining_principal = (@remaining_principal - @principal_payment)
 	end
 
-	@total_repayments = @monthly_total.inject(:+).round(2)
-	@monthly_repayments = (@monthly_total.inject(:+) / 36).round(2)
+	@total_repayments = @monthly_total.inject(:+)
+	@monthly_repayments = (@monthly_total.inject(:+) / 36)
 
-
-	puts "the amount requested was #{@amount_request}, we can offer a loan at a rate of #{@compound_interest.round(2)} with monthly repayments of #{@monthly_repayments} with a total repayment of #{@total_repayments}"
+	puts "the amount requested was #{@amount_request}, we can offer a loan at a rate of #{@compound_interest.round(2)} with monthly repayments of #{@monthly_repayments.round(2)} with a total repayment of #{@total_repayments}"
 end
