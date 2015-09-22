@@ -37,4 +37,18 @@ else
 	puts "The compound interest is #{@compound_interest.round(2)}"
 	@principal_payment = @amount_request / 36
 	puts "The principal payment is #{@principal_payment.round(2)}"
+
+	@remaining_principal = @amount_request
+	@monthly_total = []
+	until @remaining_principal <= 0 do
+		@interest_per_month = ((@remaining_principal.round(2) * @compound_interest.round(2)) / 12)
+		puts @interest_per_month.round(2)
+		@monthly_payment = @principal_payment.round(2) + @interest_per_month.round(2)
+		puts @monthly_payment
+		@monthly_total << @monthly_payment
+		@remaining_principal = @remaining_principal - @principal_payment.round(2)
+		puts @remaining_principal.round(2)
+	end
+
+	puts (@monthly_total.inject(:+) / 36).round(2)
 end
