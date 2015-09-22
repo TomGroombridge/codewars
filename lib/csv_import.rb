@@ -50,5 +50,10 @@ else
 		puts @remaining_principal.round(2)
 	end
 
-	puts (@monthly_total.inject(:+) / 36).round(2)
+	@total_repayments = @monthly_total.inject(:+).round(2)
+	@monthly_repayments = (@monthly_total.inject(:+) / 36).round(2)
+
+
+
+	puts "the amount requested was #{@amount_request}, we can offer a loan at a rate of #{@compound_interest.round(2)} with monthly repayments of #{@monthly_repayments} with a total repayment of #{@total_repayments}"
 end
