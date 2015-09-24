@@ -32,15 +32,15 @@ class Quote
 			CSV.foreach(@path_to_file, headers: true) do |row|
 			  @lenders << {:name => row[0], :rate => row[1], :amount => row[2]}
 			end
-			order_lenders_by_interest
+			order_lenders_by_interest(@lenders)
 		else
 			puts "sorry but the path you has specified for the file does not exists"
 		end
 	end
 
-	def order_lenders_by_interest
-		@amount = @lenders.inject(0) {|sum, hash| sum + hash[:amount].to_f}
-		@ordered_lenders = @lenders.sort_by { |hsh| hsh[:rate].to_f }
+	def order_lenders_by_interest(lender_list)
+		@amount = lender_list.inject(0) {|sum, hash| sum + hash[:amount].to_f}
+		@ordered_lenders = lender_list.sort_by { |hsh| hsh[:rate].to_f }
 		@lenders_amounts = @ordered_lenders.map{|x| x[:amount].to_f}
 		check_for_loan
 	end
