@@ -7,8 +7,14 @@ class Quote
 
 	def interest(path_to_file, number)
 		@requested_amount = number
+		puts @requested_amount.step(100)
+		@increments = (1000..15000).step(100).to_a
 		if @requested_amount >= 1000 && @requested_amount <= 15000
-			pull_in_lender_info(path_to_file)
+			if (@increments.include? @requested_amount) == true
+				pull_in_lender_info(path_to_file)
+			else
+				puts "I'm sorry but you can only apply for a loan in increments of £100.00"
+			end
 		else
 			puts "I'm sorry but we only quote for requested amounts between £1000.00 and £15,000.00"
 		end
@@ -22,7 +28,7 @@ class Quote
 			end
 			order_lenders_by_interest
 		else
-			puts "sorry but the path you has specified does not exists"
+			puts "sorry but the path you has specified for the file does not exists"
 		end
 	end
 
