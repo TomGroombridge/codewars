@@ -14,15 +14,23 @@ class Quote
 	end
 
 	def validate_quote
-		@increments = (QUOTE_MINIMUM..QUOTE_MAXIMUM).step(100).to_a
-		if @requested_amount >= QUOTE_MINIMUM && @requested_amount <= QUOTE_MAXIMUM
+		if correct_amount == true
 			if (@increments.include? @requested_amount) == true
 				pull_in_lender_info
 			else
-				puts "I'm sorry but you can only apply for a loan in increments of £100.00"
+				"I'm sorry but you can only apply for a loan in increments of £100.00"
 			end
 		else
-			puts "I'm sorry but we only quote for requested amounts between £1000.00 and £15,000.00"
+			"I'm sorry but we only quote for requested amounts between £1000.00 and £15,000.00"
+		end
+	end
+
+	def correct_amount
+		@increments = (QUOTE_MINIMUM..QUOTE_MAXIMUM).step(100).to_a
+		if @requested_amount >= QUOTE_MINIMUM && @requested_amount <= QUOTE_MAXIMUM
+			true
+		else
+			false
 		end
 	end
 
