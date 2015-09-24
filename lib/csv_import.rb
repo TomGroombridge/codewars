@@ -3,13 +3,17 @@ require 'csv'
 class Quote
 
 	LOAN_TERM = 36
+	QUOTE_MINIMUM = 1000
+	QUOTE_MAXIMUM = 15000
+	INTEREST_COMPOUNDED_PER_YEAR = 12
+
 
 
 	def interest(path_to_file, number)
 		@requested_amount = number
 		puts @requested_amount.step(100)
-		@increments = (1000..15000).step(100).to_a
-		if @requested_amount >= 1000 && @requested_amount <= 15000
+		@increments = (QUOTE_MINIMUM..QUOTE_MAXIMUM).step(100).to_a
+		if @requested_amount >= QUOTE_MINIMUM && @requested_amount <= QUOTE_MAXIMUM
 			if (@increments.include? @requested_amount) == true
 				pull_in_lender_info(path_to_file)
 			else
@@ -73,7 +77,7 @@ class Quote
 		@remaining_principal = @requested_amount
 		@total_repayments = 0
 		until @remaining_principal <= 0 do
-			@interest_per_month = ((@remaining_principal * @rate) / 12)
+			@interest_per_month = ((@remaining_principal * @rate) / INTEREST_COMPOUNDED_PER_YEAR)
 			@total_repayments += (@principal_payment + @interest_per_month)
 			@remaining_principal = (@remaining_principal - @principal_payment)
 		end
