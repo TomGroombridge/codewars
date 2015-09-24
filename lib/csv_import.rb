@@ -47,10 +47,22 @@ class Quote
 	end
 
 	def order_lenders_by_interest(lender_list)
-		@amount = lender_list.inject(0) {|sum, hash| sum + hash[:amount].to_f}
-		@ordered_lenders = lender_list.sort_by { |hsh| hsh[:rate].to_f }
-		@lenders_amounts = @ordered_lenders.map{|x| x[:amount].to_f}
+		@amount = amount_of_funds(lender_list)
+		@ordered_lenders = ordered_lenders(lender_list)
+		@lenders_amounts = lenders_amounts(@ordered_lenders)
 		check_for_loan(@amount)
+	end
+
+	def amount_of_funds(lender_list)
+		lender_list.inject(0) {|sum, hash| sum + hash[:amount].to_f}
+	end
+
+	def ordered_lenders(lender_list)
+		lender_list.sort_by { |hsh| hsh[:rate].to_f }
+	end
+
+	def lenders_amounts(ordered_lenders)
+		ordered_lenders.map{|x| x[:amount].to_f}
 	end
 
 	def enough_funds(amount_available)
