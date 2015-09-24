@@ -5,10 +5,15 @@ RSpec.describe 'csv import' do
 	let(:quote) {Quote.new}
 
 	it "should return a error message if the amount requested is under £1000" do
+		stub_const("ARGV", ['market_file', 999])
+		expect(quote.correct_amount).to be false
+		expect(quote.validate_quote).to eq "I'm sorry but we only quote for requested amounts between £1000.00 and £15,000.00"
 	end
 
 	it "should return a error message if the amount requested is over £15000" do
-
+		stub_const("ARGV", ['market_file', 15001])
+		expect(quote.correct_amount).to be false
+		expect(quote.validate_quote).to eq "I'm sorry but we only quote for requested amounts between £1000.00 and £15,000.00"
 	end
 
 	it "should return a error message if the amount requested is not incremented by £100" do
@@ -32,9 +37,6 @@ RSpec.describe 'csv import' do
 	end
 
 	it "should be able to sort lender by rate available" do
-		stub_const("ARGV", ['market_file', 15001])
-		expect(quote.correct_amount).to be false
-		expect(quote.validate_quote).to eq "I'm sorry but we only quote for requested amounts between £1000.00 and £15,000.00"
 	end
 
 
