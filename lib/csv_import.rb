@@ -1,5 +1,4 @@
 require 'csv'
-
 class Quote
 
 	LOAN_TERM = 36
@@ -9,16 +8,16 @@ class Quote
 
 
 	def initialize
-		interest("./market.csv", 1000.00)
+		@path_to_file = ARGV[0]
+		@requested_amount = ARGV[1].to_f
+		validate_quote
 	end
 
-	def interest(path_to_file, number)
-		@requested_amount = number
-		puts @requested_amount.step(100)
+	def validate_quote
 		@increments = (QUOTE_MINIMUM..QUOTE_MAXIMUM).step(100).to_a
 		if @requested_amount >= QUOTE_MINIMUM && @requested_amount <= QUOTE_MAXIMUM
 			if (@increments.include? @requested_amount) == true
-				pull_in_lender_info(path_to_file)
+				pull_in_lender_info
 			else
 				puts "I'm sorry but you can only apply for a loan in increments of £100.00"
 			end
@@ -27,10 +26,10 @@ class Quote
 		end
 	end
 
-	def pull_in_lender_info(path_to_file)
+	def pull_in_lender_info
 		@lenders = []
-		if File.exists?(path_to_file)
-			CSV.foreach(path_to_file, headers: true) do |row|
+		if File.exists?(@path_to_file)
+			CSV.foreach(@path_to_file, headers: true) do |row|
 			  @lenders << {:name => row[0], :rate => row[1], :amount => row[2]}
 			end
 			order_lenders_by_interest
@@ -102,5 +101,11 @@ class Quote
 
 end
 
-quote = Quote.new
-# puts @quote.interest("./market.csv", 1000.00)
+Quote.new
+
+
+
+
+
+
+
