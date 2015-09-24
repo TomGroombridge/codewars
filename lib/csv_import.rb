@@ -14,17 +14,17 @@ class Hello
 		if @requested_amount > @amount
 			puts "sorry we can't offer you a loan"
 		else
-			@lenders_needed = []
+			@lenders_needed = 0
 			@i = 0
 			@ordered_lenders.each do |a|
 				unless @i >= @requested_amount
-					@lenders_needed << @i
+					@lenders_needed += 1
 					@i += a
 				end
 			end
 			@total_compound_interest = []
-			@lenders.first(@lenders_needed.count).each {|l| @total_compound_interest << l.values_at(:compound_interest)}
-			@rate = (@total_compound_interest.flatten.map(&:to_f).inject(:+) / @lenders_needed.count).round(2)
+			@lenders.first(@lenders_needed).each {|l| @total_compound_interest << l.values_at(:compound_interest)}
+			@rate = (@total_compound_interest.flatten.map(&:to_f).inject(:+) / @lenders_needed).round(2)
 			@principal_payment = (@requested_amount / 36).round(2)
 			@remaining_principal = @requested_amount
 			@monthly_total = 0
