@@ -1,23 +1,22 @@
 require 'csv'
+class Quote
 
-class Hello
-
-	def interest(number)
+	def interest(path_to_file, number)
 		@requested_amount = number
-		pull_in_lender_info
+		pull_in_lender_info(path_to_file)
 	end
 
-	def pull_in_lender_info
+	def pull_in_lender_info(path_to_file)
 		@lenders = []
-		CSV.foreach("./market.csv", headers: true) do |row|
-		  @lenders << {:name => row[0], :compound_interest => row[1], :amount => row[2]}
+		CSV.foreach(path_to_file, headers: true) do |row|
+		  @lenders << {:name => row[0], :rate => row[1], :amount => row[2]}
 		end
 		order_lenders_by_interest
 	end
 
 	def order_lenders_by_interest
 		@amount = @lenders.inject(0) {|sum, hash| sum + hash[:amount].to_f}
-		@lenders = @lenders.sort_by { |hsh| hsh[:compound_interest] }
+		@lenders = @lenders.sort_by { |hsh| hsh[:rate] }
 		@ordered_lenders = @lenders.map{|x| x[:amount].to_f}
 		check_for_loan
 	end
@@ -39,41 +38,43 @@ class Hello
 				@i += a
 			end
 		end
-		get_compound_interest
+		compound_interest
 	end
 
-	def get_compound_interest
+	def compound_interest
 		@total_compound_interest = []
-		@lenders.first(@lenders_needed).each {|l| @total_compound_interest << l.values_at(:compound_interest)}
+		@lenders.first(@lenders_needed).each {|l| @total_compound_interest << l.values_at(:rate)}
 		set_rate
 	end
 
 	def set_rate
-		@rate = (@total_compound_interest.flatten.map(&:to_f).inject(:+) / @lenders_needed).round(2)
+		@rate = (@total_compound_interest.flatten.map(&:to_f).inject(:+) / @lenders_needed)
 		set_principal_payment
 	end
 
 	def set_principal_payment
-		@principal_payment = (@requested_amount / 36).round(2)
-		set_total_and_monthly_repayments
+		@principal_payment = (@requested_amount / 36)
+		set_repayments
 	end
 
-	def set_total_and_monthly_repayments
+	def set_repayments
 		@remaining_principal = @requested_amount
-		@monthly_total = 0
+		@total_repayments = 0
 		until @remaining_principal <= 0 do
 			@interest_per_month = ((@remaining_principal * @rate) / 12)
-			@monthly_payment = (@principal_payment + @interest_per_month).round(2)
-			@monthly_total += @monthly_payment
+			@total_repayments += (@principal_payment + @interest_per_month)
 			@remaining_principal = (@remaining_principal - @principal_payment)
 		end
-		@total_repayments = @monthly_total
-		@monthly_repayments = (@monthly_total / 36)
+		@total_repayments
+		@monthly_repayments = (@total_repayments / 36)
 		send_quote
 	end
 
 	def send_quote
-		puts "the amount requested was #{@requested_amount}, we can offer a loan at a rate of #{@rate.round(2)} with monthly repayments of #{@monthly_repayments.round(2)} with a total repayment of #{@total_repayments}"
+		puts " Requested amount: £#{@requested_amount}"
+		puts " Rate: #{(@rate.round(2)* 100.0).round(1)}%"
+		puts " Monthly repayment: £#{@monthly_repayments.round(2)}"
+		puts " Total repayment: £#{@total_repayments.round(2)}"
 	end
 
 	def no_loan
@@ -82,5 +83,5 @@ class Hello
 
 end
 
-@test = Hello.new
-puts @test.interest(1000.00)
+@quote = Quote.new
+puts @quote.interest("./market.csv", 1000.00)
