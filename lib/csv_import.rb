@@ -50,11 +50,19 @@ class Quote
 		@amount = lender_list.inject(0) {|sum, hash| sum + hash[:amount].to_f}
 		@ordered_lenders = lender_list.sort_by { |hsh| hsh[:rate].to_f }
 		@lenders_amounts = @ordered_lenders.map{|x| x[:amount].to_f}
-		check_for_loan
+		check_for_loan(@amount)
 	end
 
-	def check_for_loan
-		if @requested_amount > @amount
+	def enough_funds(amount_available)
+		if @requested_amount > amount_available
+			false
+		else
+			true
+		end
+	end
+
+	def check_for_loan(amount_available)
+		if enough_funds(amount_available) == false
 			no_loan
 		else
 			lenders_needed
