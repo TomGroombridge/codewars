@@ -23,7 +23,9 @@ RSpec.describe 'csv import' do
 	end
 
 	it "should return a error message if the path to the csv file does not exist" do
-
+		stub_const("ARGV", ['market_file', 1000])
+		expect(quote.correct_amount).to be true
+		expect(quote.validate_quote).to eq "sorry but the path you has specified for the file does not exists"
 	end
 
 	it "should return a error message if the file format is not '.csv' " do

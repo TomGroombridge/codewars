@@ -42,7 +42,7 @@ class Quote
 			end
 			order_lenders_by_interest(@lenders)
 		else
-			puts "sorry but the path you has specified for the file does not exists"
+			"sorry but the path you has specified for the file does not exists"
 		end
 	end
 
