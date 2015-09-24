@@ -17,7 +17,9 @@ RSpec.describe 'csv import' do
 	end
 
 	it "should return a error message if the amount requested is not incremented by £100" do
-
+		stub_const("ARGV", ['market_file', 1001])
+		expect(quote.correct_amount).to be true
+		expect(quote.validate_quote).to eq "I'm sorry but you can only apply for a loan in increments of £100.00"
 	end
 
 	it "should return a error message if the path to the csv file does not exist" do
