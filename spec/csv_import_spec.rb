@@ -70,7 +70,8 @@ RSpec.describe 'csv import' do
 
 
 		it "should be able to create a list of all the lenders amount" do
-
+			ordered_lenders = quote.ordered_lenders(@lender_list)
+			expect(quote.lenders_amounts(ordered_lenders)).to eq([480.0, 520.0, 60.0, 140.0, 640.0, 320.0, 170.0])
 		end
 	end
 
