@@ -48,7 +48,7 @@ class Quote
 	end
 
 	def set_rate
-		@rate = (@total_compound_interest.flatten.map(&:to_f).inject(:+) / @lenders_needed)
+		@rate = (@total_compound_interest.flatten.map(&:to_f).inject(:+) / @lenders_needed).round(2)
 		set_principal_payment
 	end
 
@@ -61,12 +61,12 @@ class Quote
 		@remaining_principal = @requested_amount
 		@total_repayments = 0
 		until @remaining_principal <= 0 do
-			@interest_per_month = ((@remaining_principal * @rate) / 12)
+			@interest_per_month = ((@remaining_principal * @rate) / 12).round(2)
 			@total_repayments += (@principal_payment + @interest_per_month)
 			@remaining_principal = (@remaining_principal - @principal_payment)
 		end
-		@total_repayments
-		@monthly_repayments = (@total_repayments / 36)
+		@monthly_repayments = (@total_repayments / 36).round(2)
+		@total_repayments = (@monthly_repayments * 36).round(2)
 		send_quote
 	end
 
@@ -78,7 +78,7 @@ class Quote
 	end
 
 	def no_loan
-		puts "sorry we can't offer you a loan"
+		puts "sorry we can't offer you a loan at this time"
 	end
 
 end
