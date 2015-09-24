@@ -8,6 +8,9 @@ class Quote
 	INTEREST_COMPOUNDED_PER_YEAR = 12
 
 
+	def initialize
+		interest("./market.csv", 1000.00)
+	end
 
 	def interest(path_to_file, number)
 		@requested_amount = number
@@ -99,5 +102,5 @@ class Quote
 
 end
 
-@quote = Quote.new
-puts @quote.interest("./market.csv", 1000.00)
+quote = Quote.new
+# puts @quote.interest("./market.csv", 1000.00)
