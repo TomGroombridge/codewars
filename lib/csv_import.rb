@@ -1,23 +1,35 @@
 require 'csv'
+
 class Quote
+
+	LOAN_TERM = 36
+
 
 	def interest(path_to_file, number)
 		@requested_amount = number
-		pull_in_lender_info(path_to_file)
+		if @requested_amount >= 1000 && @requested_amount <= 15000
+			pull_in_lender_info(path_to_file)
+		else
+			puts "I'm sorry but we only quote for requested amounts between £1000.00 and £15,000.00"
+		end
 	end
 
 	def pull_in_lender_info(path_to_file)
 		@lenders = []
-		CSV.foreach(path_to_file, headers: true) do |row|
-		  @lenders << {:name => row[0], :rate => row[1], :amount => row[2]}
+		if File.exists?(path_to_file)
+			CSV.foreach(path_to_file, headers: true) do |row|
+			  @lenders << {:name => row[0], :rate => row[1], :amount => row[2]}
+			end
+			order_lenders_by_interest
+		else
+			puts "sorry but the path you has specified does not exists"
 		end
-		order_lenders_by_interest
 	end
 
 	def order_lenders_by_interest
 		@amount = @lenders.inject(0) {|sum, hash| sum + hash[:amount].to_f}
-		@lenders = @lenders.sort_by { |hsh| hsh[:rate] }
-		@ordered_lenders = @lenders.map{|x| x[:amount].to_f}
+		@ordered_lenders = @lenders.sort_by { |hsh| hsh[:rate].to_f }
+		@lenders_amounts = @ordered_lenders.map{|x| x[:amount].to_f}
 		check_for_loan
 	end
 
@@ -32,7 +44,7 @@ class Quote
 	def lenders_needed
 		@lenders_needed = 0
 		@i = 0
-		@ordered_lenders.each do |a|
+		@lenders_amounts.each do |a|
 			unless @i >= @requested_amount
 				@lenders_needed += 1
 				@i += a
@@ -42,18 +54,12 @@ class Quote
 	end
 
 	def compound_interest
-		@total_compound_interest = []
-		@lenders.first(@lenders_needed).each {|l| @total_compound_interest << l.values_at(:rate)}
-		set_rate
-	end
-
-	def set_rate
-		@rate = (@total_compound_interest.flatten.map(&:to_f).inject(:+) / @lenders_needed).round(2)
+		@rate = (@ordered_lenders.first(@lenders_needed).inject(0) {|sum, hash| sum + hash[:rate].to_f} / @lenders_needed).round(2)
 		set_principal_payment
 	end
 
 	def set_principal_payment
-		@principal_payment = (@requested_amount / 36)
+		@principal_payment = (@requested_amount / LOAN_TERM)
 		set_repayments
 	end
 
@@ -61,12 +67,12 @@ class Quote
 		@remaining_principal = @requested_amount
 		@total_repayments = 0
 		until @remaining_principal <= 0 do
-			@interest_per_month = ((@remaining_principal * @rate) / 12).round(2)
+			@interest_per_month = ((@remaining_principal * @rate) / 12)
 			@total_repayments += (@principal_payment + @interest_per_month)
 			@remaining_principal = (@remaining_principal - @principal_payment)
 		end
-		@monthly_repayments = (@total_repayments / 36).round(2)
-		@total_repayments = (@monthly_repayments * 36).round(2)
+		@monthly_repayments = (@total_repayments / LOAN_TERM).round(2)
+		@total_repayments = (@monthly_repayments * LOAN_TERM).round(2)
 		send_quote
 	end
 
@@ -78,7 +84,7 @@ class Quote
 	end
 
 	def no_loan
-		puts "sorry we can't offer you a loan at this time"
+		puts "sorry we can't offer you a quote at this time"
 	end
 
 end
