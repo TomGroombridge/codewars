@@ -4,13 +4,25 @@ class Hello
 
 	def interest(number)
 		@requested_amount = number
+		pull_in_lender_info
+	end
+
+	def pull_in_lender_info
 		@lenders = []
 		CSV.foreach("./market.csv", headers: true) do |row|
 		  @lenders << {:name => row[0], :compound_interest => row[1], :amount => row[2]}
 		end
+		order_lenders_by_interest
+	end
+
+	def order_lenders_by_interest
 		@amount = @lenders.inject(0) {|sum, hash| sum + hash[:amount].to_f}
 		@lenders = @lenders.sort_by { |hsh| hsh[:compound_interest] }
 		@ordered_lenders = @lenders.map{|x| x[:amount].to_f}
+		set_loan
+	end
+
+	def set_loan
 		if @requested_amount > @amount
 			puts "sorry we can't offer you a loan"
 		else
@@ -39,6 +51,7 @@ class Hello
 			puts "the amount requested was #{@requested_amount}, we can offer a loan at a rate of #{@rate.round(2)} with monthly repayments of #{@monthly_repayments.round(2)} with a total repayment of #{@total_repayments}"
 		end
 	end
+
 end
 
 test = Hello.new
