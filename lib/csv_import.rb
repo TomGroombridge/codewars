@@ -6,26 +6,24 @@ class Hello
 		@requested_amount = number
 		@lenders = []
 		CSV.foreach("./market.csv", headers: true) do |row|
-		  @lenders << {'name' => row[0], 'compound_interest' => row[1], 'amount' => row[2]}
+		  @lenders << {:name => row[0], :compound_interest => row[1], :amount => row[2]}
 		end
-		@lenders = @lenders.sort_by { |hsh| hsh['compound_interest'] }
-		@amount_of_each_lender = @lenders.map{|h| h["amount"] }
-		# raise @amount_of_each_lender.inspect
-		@amount = @amount_of_each_lender.flatten.map(&:to_f)
-		@offers_from_lenders = @amount.inject(:+)
-		if @requested_amount > @offers_from_lenders
+		@amount = @lenders.inject(0) {|sum, hash| sum + hash[:amount].to_f}
+		@lenders = @lenders.sort_by { |hsh| hsh[:compound_interest] }
+		@ordered_lenders = @lenders.map{|x| x[:amount].to_f}
+		if @requested_amount > @amount
 			puts "sorry we can't offer you a loan"
 		else
 			@lenders_needed = []
 			@i = 0
-			@amount.each do |a|
+			@ordered_lenders.each do |a|
 				unless @i >= @requested_amount
 					@lenders_needed << @i
 					@i += a
 				end
 			end
 			@total_compound_interest = []
-			@lenders.first(@lenders_needed.count).each {|l| @total_compound_interest << l.values_at('compound_interest')}
+			@lenders.first(@lenders_needed.count).each {|l| @total_compound_interest << l.values_at(:compound_interest)}
 			@rate = (@total_compound_interest.flatten.map(&:to_f).inject(:+) / @lenders_needed.count).round(2)
 			@principal_payment = (@requested_amount / 36).round(2)
 			@remaining_principal = @requested_amount
