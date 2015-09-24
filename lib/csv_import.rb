@@ -39,25 +39,41 @@ class Hello
 				@i += a
 			end
 		end
-		set_loan
+		get_compound_interest
 	end
 
-	def set_loan
-			@total_compound_interest = []
-			@lenders.first(@lenders_needed).each {|l| @total_compound_interest << l.values_at(:compound_interest)}
-			@rate = (@total_compound_interest.flatten.map(&:to_f).inject(:+) / @lenders_needed).round(2)
-			@principal_payment = (@requested_amount / 36).round(2)
-			@remaining_principal = @requested_amount
-			@monthly_total = 0
-			until @remaining_principal <= 0 do
-				@interest_per_month = ((@remaining_principal * @rate) / 12)
-				@monthly_payment = (@principal_payment + @interest_per_month).round(2)
-				@monthly_total += @monthly_payment
-				@remaining_principal = (@remaining_principal - @principal_payment)
-			end
-			@total_repayments = @monthly_total
-			@monthly_repayments = (@monthly_total / 36)
-			puts "the amount requested was #{@requested_amount}, we can offer a loan at a rate of #{@rate.round(2)} with monthly repayments of #{@monthly_repayments.round(2)} with a total repayment of #{@total_repayments}"
+	def get_compound_interest
+		@total_compound_interest = []
+		@lenders.first(@lenders_needed).each {|l| @total_compound_interest << l.values_at(:compound_interest)}
+		set_rate
+	end
+
+	def set_rate
+		@rate = (@total_compound_interest.flatten.map(&:to_f).inject(:+) / @lenders_needed).round(2)
+		set_principal_payment
+	end
+
+	def set_principal_payment
+		@principal_payment = (@requested_amount / 36).round(2)
+		set_total_and_monthly_repayments
+	end
+
+	def set_total_and_monthly_repayments
+		@remaining_principal = @requested_amount
+		@monthly_total = 0
+		until @remaining_principal <= 0 do
+			@interest_per_month = ((@remaining_principal * @rate) / 12)
+			@monthly_payment = (@principal_payment + @interest_per_month).round(2)
+			@monthly_total += @monthly_payment
+			@remaining_principal = (@remaining_principal - @principal_payment)
+		end
+		@total_repayments = @monthly_total
+		@monthly_repayments = (@monthly_total / 36)
+		send_quote
+	end
+
+	def send_quote
+		puts "the amount requested was #{@requested_amount}, we can offer a loan at a rate of #{@rate.round(2)} with monthly repayments of #{@monthly_repayments.round(2)} with a total repayment of #{@total_repayments}"
 	end
 
 	def no_loan
@@ -66,5 +82,5 @@ class Hello
 
 end
 
-test = Hello.new
-puts test.interest(1000.00)
+@test = Hello.new
+puts @test.interest(1000.00)
